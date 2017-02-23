@@ -62,51 +62,53 @@ var slaveCircle = {
   returnHome: function(evt) { 
     this._translate(this.me, this.origin.x, this.origin.y);
   },
+  _css: function( element, property ) {
+    return window.getComputedStyle( element, null ).getPropertyValue( property );
+  },
   
-_translate: function( elem, x, y) {
+  _translate: function(elem, x, y) {
     var left = parseInt( this._css( elem, 'left' ), 10 ),
         top = parseInt( this._css( elem, 'top' ), 10 ),
         // Calculate distance to the origin.
         dx = left - x,
         dy = top - y,
         i = 1,
-        count = 111,
+        count = 67,
         delay = 5;
-    
+
+        
     function loop() {
         if ( i >= count )  return;
         if (true) { }
         i += 1;
-        
-        // reduce distance proportionaly
+
+        // Reduce distance proportionaly
         var stepCloserX = ( left - ( dx * i / count ) ).toFixed();
         var stepCloserY = ( top - ( dy * i / count ) ).toFixed();
 
         elem.style.left = stepCloserX + 'px';
         elem.style.top = stepCloserY + 'px';
-        log(this.radius);
+
         // Deltas between window center and slave circle's center
-        var delta_x = Math.abs((window.innerWidth/2) - (Math.abs(stepCloserX) + 40));
-        var delta_y = Math.abs((window.innerHeight/2) - (Math.abs(stepCloserY) + 40));        
-        if (  delta_x < 100 && delta_y < 100 &&  delta_x + delta_y <= 100) return;        
+        var delta_x = Math.abs((window.innerWidth/2) - (Math.abs(stepCloserX) + slaveCircle.radius));
+        var delta_y = Math.abs((window.innerHeight/2) - (Math.abs(stepCloserY) + slaveCircle.radius)); 
+        var delta_hypotenuse = Math.sqrt((delta_x*delta_x + delta_y*delta_y));
+
+        if(delta_hypotenuse <= slaveCircle.radius + masterCircle.radius + 1) return;
 
         setTimeout( loop, delay );
     }
     
     loop();
-  },
-
- _css: function( element, property ) {
-    return window.getComputedStyle( element, null ).getPropertyValue( property );
-  } 
+  }
 }
 
 
 // Render circles
 window.addEventListener("load", function() {
 
-  masterCircle.init(60);
-  slaveCircle.init(40, masterCircle.radius);
+  masterCircle.init(30);
+  slaveCircle.init(30, masterCircle.radius);
 
   function wrapper(e) {   slaveCircle.moveCircle(e);   }
   
@@ -122,6 +124,5 @@ window.addEventListener("load", function() {
         document.removeEventListener('mousemove', wrapper);
         slaveCircle.returnHome(e);
   });
-
   
 }); 
